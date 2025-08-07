@@ -1,0 +1,270 @@
+<!DOCTYPE HTML><!--define html5 document-->
+<html lang="en"> <!--thẻ gốc của tài liệu -->
+
+<head> <!-- chứa thông tin ẩn về trang web -->
+  <title>ESP32 DASHBOARD</title>
+  <!-- title , meta(cấu hình hiển thị trên thiết bị di động), link liên kết tới css, font, style script -->
+  <meta charset="UTF-8">
+  <meta name="description" content="ESP32 DASHBOARD">
+  <meta name="author" content="Nguyen Truong Giang">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="icon" href="data:,">
+  <style>
+    html {
+      font-family: Arial;
+      display: inline-block;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    .boundary
+    {
+      width: 97vw;
+      min-height: 96vh;
+      margin: auto;
+      padding: 10px;
+      background: #e0e3f0;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    }
+
+    .name_of_dashboard {
+      margin : auto;
+      overflow: hidden;
+      background-color: #e0e4f7;
+      color: #3b36e0;
+      font-size: 0.5rem;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .wifi{
+      margin: 20px auto;
+      border-radius: 10px;
+      justify-content: center;
+      display: flex;
+      color: #d9dded;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      width: 500px;
+    }
+    .wifi-table {
+      border-collapse: collapse;
+      color: #000000;
+    }
+
+    .wifi-table td {
+      padding: 12px;
+      font-size: large;
+     
+    }
+    .content {
+      padding: 50px;
+      display: none;
+    }
+    .card {
+      background-color: white;
+      box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, .5);
+    }
+    .cards {
+      max-width: 700px;
+      margin: 0 auto;
+      display: grid;
+      grid-gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+    .reading {
+      font-size: 2.8rem;
+    }
+
+    .timestamp {
+      color: #bebebe;
+      font-size: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .card.temperature {
+      color: #B10F2E;
+    }
+
+    .card.humidity {
+      color: #50B8B4;
+    }
+
+    /* phần của switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+
+    /* phần của button */
+    .btn1 {
+      background-color: white;
+      border: 1.5px solid black;
+      color: black;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 12px;
+    }
+
+    /* Darker background on mouse-over */
+    .btn1:hover {
+      background-color: #0feb57;
+    }
+
+    .btn2 {
+      background-color: white;
+      border: 1.5px solid black;
+      color: black;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 12px;
+    }
+
+    /* Darker background on mouse-over */
+    .btn2:hover {
+      background-color: #f6040c;
+    }
+
+    /*Slider*/
+    .pwm-slider {
+      width: 100%;
+    }
+
+    .range {
+      display: flex;
+      justify-content: space-between;
+      margin: 0 5px;
+    }
+
+    input[type=range] {
+      width: 100%;
+    }
+
+    .value-display {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="boundary">
+    <div class="name_of_dashboard">
+        <h1>MY DASHBOARD</h1>
+    </div>
+    <!-- ================================WIFI SETUP=============================================== -->
+    <h1 style="margin: 50px; font-size:30px">WiFi Setup</h1>
+    <div class="wifi" id="wf">
+      <table class="wifi-table">
+        <tr>
+          <td><label for="ssid">SSID:</label></td>
+          <td><input type="text" id="ssid"></td>
+        </tr>
+        <tr>
+          <td><label for="pwd">Password:</label></td>
+          <td><input type="text" id="pwd"></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+          <button onclick="submit_function()">Submit</button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+          <p id="notify"></p>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <script> // điều khiển hành vi của trang web , mã javescript 
+
+    function submit_function() 
+  {
+      var cnt = document.getElementById("notify")
+      cnt.innerHTML = '<span style="color: green;">Đã kết nối WiFi!</span>';
+
+      var ssid = document.getElementById("ssid").value;
+      var pwd = document.getElementById("pwd").value;
+      var xhttp=new XMLHttpRequest();
+      xhttp.open("POST", "/post?wifiinfo", true);
+      xhttp.send(ssid + "/" + pwd);
+  }   
+  </script>
+</body>
+</html>
