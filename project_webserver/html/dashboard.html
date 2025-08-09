@@ -1,0 +1,399 @@
+<!DOCTYPE HTML><!--define html5 document-->
+<html lang="en"> <!--thẻ gốc của tài liệu -->
+
+<head> <!-- chứa thông tin ẩn về trang web -->
+  <title>ESP32 DASHBOARD</title>
+  <!-- title , meta(cấu hình hiển thị trên thiết bị di động), link liên kết tới css, font, style script -->
+  <meta charset="UTF-8">
+  <meta name="description" content="ESP32 DASHBOARD">
+  <meta name="author" content="Nguyen Truong Giang">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    html {
+      font-family: Arial;
+      display: inline-block;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+    }
+    h2{
+      font-size: 1rem;
+    }
+
+    body {
+      margin: 0;
+    }
+    .boundary
+    {
+      width: 97%;
+      min-height: 96%;
+      margin: auto;
+      padding: 10px;
+      background: #e0e3f0;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    }
+
+    .name_of_dashboard {
+      margin : auto;
+      overflow: hidden;
+      background-color: #e0e4f7;
+      color: #3b36e0;
+      font-size: 0.5rem;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .card {
+      display: flex;
+      padding: 3%;
+      margin:auto;
+      width: 90%;
+    }
+    .reading {
+      font-size: 2.8rem;
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+     .card_temperature{
+      display: block;
+      width: 20%;
+      color: #B10F2E;
+      margin-right:5%; 
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .card_humidity{
+      display: block;
+      width: 20%;
+      color: #50B8B4;
+      margin-right:10%; 
+      /* border: 1px solid #000; */
+      border-radius: 30px;
+       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+   
+    .gauss_temperature{
+      display: block;
+      width: 20%;
+      margin-right:5%; 
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .gauss_humidity{
+      display: block;
+      width: 20%;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    /* ring gauss =======================================================*/
+    .ring_class{
+      text-align: center;
+      margin-bottom: 3%;
+      margin-top: 7%;
+      color: #0f33d4;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .ring {
+      --percent: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(#0f33d4 calc(var(--percent) * 1%), #eee 0%); 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin: auto;
+      transition: background 1s ease;
+    }
+
+    .ring::before {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background:#e0e3f0;
+      border-radius: 50%;
+    }
+
+    .value {
+      position: absolute;
+      font-size: 18px;
+      font-weight: bold;
+      color: #5571ed;
+    }
+    /* ============================================= */
+    .chart{
+      display: flex;
+      padding: 2%;
+    }
+    .temp_chart{
+      margin: auto;
+    }
+    .humid_chart{
+      margin: auto;
+    }
+     .chart_boundary
+    {
+      width: 40%;
+      height: 5%;
+      margin: auto;
+      padding: 5px;
+      background: #e0e3f0ff;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    }
+    /* ============================================= */
+    .functions{
+      width: 90%;
+      height: 10%;
+      display: flex;
+      margin: auto;
+      justify-content: left;
+     
+    }
+    .temperature_action{
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+      width: 20%;
+      border-radius: 20px;
+      margin-right:40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 140px;
+    }
+
+    .temp_alert {
+      display: flex;
+      align-items: center;
+      border-radius: 20px;
+      padding: 10px 20px;
+      gap: 10px;
+      background-color: #e0e3f0ff;
+    }
+
+    .temp_alert i {
+      font-size: 30px;
+      color: #3b36e0;
+      background-color: rgb(255, 255, 255);
+      border-radius: 50%;
+      padding: 15px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .Led{
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+      width: 20%;
+      border-radius: 20px;
+      display: block;
+      align-items: center;
+      justify-content: center;
+      height: 140px;
+
+    }
+    .change button{
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    @keyframes blink 
+    {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    .blink {
+      animation: blink 1s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="boundary" id="background_color">
+    <div class="name_of_dashboard"><h1>MY DASHBOARD</h1> </div>
+      <!-- ===============================DASHBOARD CONTENT========================================== -->
+    <div class="content" id="ct">
+        <div class="card" >
+                <div class="card_temperature">
+                  <p class="card-title"><i class="fas fa-thermometer-half"></i>TEMPERATURE</p>
+                  <p><span class="reading"><span id="t1"></span> &deg;C</span></p>
+                </div>
+                <div class="card_humidity">
+                  <p class="card-title"><i class="fas fa-tint"></i>HUMIDITY</p>
+                  <p><span class="reading"><span id="h1"></span> &percnt;</span></p>
+                </div>
+             <!--  0================================-->
+              <div class="gauss_temperature">
+                <div class="ring_class">Max Temperature</div>
+                  <div class="ring" id="temp-ring" style="--percent: 0;">
+                    <div class="value" id="temp-value">0.00</div>
+                </div>
+              </div>
+            <!--  0================================-->
+            <div class="gauss_humidity">
+              <div class="ring_class">Max Humidity</div>
+                <div class="ring" style="margin-bottom: 3%;" id="hum-ring" style="--percent: 0;">
+                  <div class="value" id="hum-value">0.00</div>
+                </div>
+              </div>   
+       </div> 
+        <!--  0================================-->
+      <div class="chart">
+            <div class="chart_boundary">
+              <div class="temp_chart">
+                <!-- <iframe width="80%" height="300" frameborder="0" src="https://stem.ubidots.com/app/dashboards/public/widget/DferLN4iTdj2WUPJ9PZbEPGT_kermgj6-wyubwK6uL4?embed=true"></iframe> -->
+                <iframe width="450" height="260" style="border: 0px" src="https://thingspeak.com/channels/3031140/charts/1?bgcolor=%23E0E3F0&color=%23FC3A2D&dynamic=true&results=60&title=Temperature&type=line&xaxis=Time&yaxis=Temperature+%28%E2%84%83%29&yaxismax=50&yaxismin=0"></iframe>
+              </div>
+            </div>
+             <div class="chart_boundary">
+               <div class="humid_chart">
+                  <!-- <iframe width="80%" height="300" frameborder="0" src="https://stem.ubidots.com/app/dashboards/public/widget/sMycAZML4zgQM67526lQ0P5ImLQ_022AY-XFgRwNa74?embed=true"></iframe> -->
+                 <iframe width="450" height="260" style="border: 1px" src="https://thingspeak.com/channels/3031140/charts/2?bgcolor=%23E0E3F0&color=%23FC3A2D&dynamic=true&results=720&title=Humidity&type=line&xaxis=Time&yaxis=Humidity+%28%25%29&yaxismax=90&yaxismin=20"></iframe>
+                </div>
+             </div>
+          </div>
+        <!-- ======================================================================================= -->
+      <div class="functions">
+            <div class="temperature_action">
+                <div class="temp_alert"> <i class="fas fa-bell" id="temp_color"></i> <h2 id="alert_color">Alert</h2> </div>
+              </div>
+              <!-- ========================================================================================= -->
+            <div class="Led">  
+                  <h2>LED</h2>
+                   <div class="color_of_led" style=" display: inline-flex;"> 
+                      <table>
+                        <tr>
+                          <td style="justify-items: left;"><label for="rgb">Color</label></td>
+                          <td style="width: 5%;"><input id="rgb" class="jscolor" data-jscolor="{onFineChange:'update(this)'}"></td>
+                        </tr>
+                      </table>
+                    </div>
+                  <div class="nummber_of_led" style="margin-top: 6px; display: inline-flex;">
+                    <table>
+                      <tr>
+                        <td style="justify-items: left;"><label for="numberled">Number</label></td>
+                        <td class="text_box" style="width: 5%;"><input type="text" id="numberled"></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="change"><button onclick="changColor()">Change</button></div>
+              </div>  
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"></script>
+  <script>
+    function update(picker) {
+      document.getElementById('rgb').innerHTML =
+        Math.round(picker.rgb[0]) + ', ' +
+        Math.round(picker.rgb[1]) + ', ' +
+        Math.round(picker.rgb[2]);
+    }
+  </script>
+  <script>
+    var xhttp1 = new XMLHttpRequest(); // kĩ thuật này gọi là AJAX, nó cho phép gửi và nhận dữ liệu từ máy chủ mà không cần tải lại trang web.
+    setInterval(function () // tạo timer để gửi yêu cầu đến máy chủ mỗi 3s
+    {
+      xhttp1.open("GET", "/reload_data", true);
+      xhttp1.send();
+    },5000
+    );
+    var last_temp_percent = 0;
+    var last_hum_percent = 0;
+    var check_alert = false;
+    xhttp1.onreadystatechange = function ()
+    {
+      const obj = JSON.parse(this.responseText);
+  
+      var alertText = document.getElementById("alert_color");
+      var alertIcon = document.getElementById("temp_color");
+     
+      var xhttp_alert = new XMLHttpRequest();
+      var cnt=0;
+      if (parseFloat(obj.temperature) > 31.0) {
+          alertText.style.color = "red";
+          alertText.textContent = "Overheat!";
+          alertIcon.style.color = "red";
+          alertText.classList.add("blink");
+          alertIcon.classList.add("blink");
+          
+          if(!check_alert)
+          {
+            xhttp_alert.open("POST", "/post?alert", true);
+            xhttp_alert.send(1);
+            check_alert=true;
+          }
+         
+      } 
+      else {
+          alertText.style.color = "black";
+          alertText.textContent = "Alert";
+          alertIcon.style.color = "#3b36e0";
+          alertIcon.classList.remove("blink");
+          alertText.classList.remove("blink");
+          if(check_alert)
+          {
+            xhttp_alert.open("POST", "/post?alert", true);
+            xhttp_alert.send(0);
+            check_alert=false;
+          }
+      }
+
+      var element1 = document.getElementById('t1');
+      element1.innerText = obj.temperature;
+      var element2 = document.getElementById('h1');
+      element2.innerText = obj.humidity;
+
+
+      var temp_percent = Math.min(obj.temperature,100);
+      if(temp_percent > last_temp_percent)
+      {
+        var temp_ring = document.getElementById('temp-ring');
+        temp_ring.style.setProperty('--percent',temp_percent);
+
+        var temp_value = document.getElementById('temp-value');
+        temp_value.textContent = temp_percent.toFixed(2);
+
+        last_temp_percent= temp_percent;
+      }
+
+      var hum_percent = Math.min(obj.humidity,100);
+      if(hum_percent > last_hum_percent)
+      {
+        var hum_ring = document.getElementById('hum-ring');
+        hum_ring.style.setProperty('--percent',hum_percent);
+
+        var humid_value = document.getElementById('hum-value'); 
+        humid_value.textContent = hum_percent.toFixed(2);
+
+        last_hum_percent= hum_percent;
+      }
+      
+    }
+    function changColor() {
+      var xhttp = new XMLHttpRequest();
+      var color = document.getElementById("rgb").value;
+      var number = document.getElementById("numberled").value;
+      xhttp.open("POST", "/post?rgb", true);
+      xhttp.send(color + "/" + number + "/");
+    }    
+  </script>
+</body>
+
+</html>
